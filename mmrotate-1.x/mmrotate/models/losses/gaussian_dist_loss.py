@@ -201,6 +201,51 @@ def kld_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, sqrt=True):
 
     return postprocess(distance, fun=fun, tau=tau)
 
+@weighted_loss
+def probiou_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, sqrt=True):
+    """ProbIoU loss.
+
+    Args:
+        pred (torch.Tensor): Predicted bboxes.
+        target (torch.Tensor): Corresponding gt bboxes.
+        fun (str): The function applied to distance. Defaults to 'log1p'. # not necessary
+        tau (float): Defaults to 1.0. # not necessary
+        alpha (float): Defaults to 1.0. # not necessary
+        sqrt (bool): Whether to sqrt the distance. Defaults to True. # not necessary
+
+    Returns:
+        loss (torch.Tensor)
+    """
+
+    xy_p, Sigma_p = pred
+    xy_t, Sigma_t = target
+
+    # Refer to https://arxiv.org/abs/2106.06072
+
+    xy_diffs = xy_p - xy_t
+    sigma_sums = Sigma_p + Sigma_t
+    det_p = Sigma_p[:, 0, 0] * Sigma_p[:, 1, 1] - (Sigma_p[:, 0, 1] ** 2) 
+    det_t = Sigma_t[:, 0, 0] * Sigma_t[:, 1, 1] - (Sigma_t[:, 0, 1] ** 2)
+
+    det_p = torch.clamp(det_p, 1e-3)
+    det_t = torch.clamp(det_t, 1e-3)
+
+    x = xy_diffs[:, 0]
+    y = xy_diffs[:, 1]
+    a = sigma_sums[:, 0, 0]
+    b = sigma_sums[:, 1, 1]
+    c = sigma_sums[:, 0, 1]
+    det = a*b - (c**2)
+
+    det = torch.clamp(det, 1e-3)
+
+    B1 = 0.25 * ((a * y**2) + (b * x**2) + 2*(-c * x * y)) / det
+    B2 = 0.5 * torch.log(det / (4 * torch.sqrt((det_p * det_t) + 1e-7))) 
+    Bd = B1 + B2
+    Bc = torch.exp(-Bd)
+    loss = torch.sqrt(1 - Bc + 1e-7)
+
+    return loss
 
 @weighted_loss
 def jd_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, sqrt=True):
@@ -332,7 +377,8 @@ class GDLoss(nn.Module):
         'kld': kld_loss,
         'jd': jd_loss,
         'kld_symmax': kld_symmax_loss,
-        'kld_symmin': kld_symmin_loss
+        'kld_symmin': kld_symmin_loss,
+        'probiou': probiou_loss
     }
     BAG_PREP = {
         'xy_stddev_pearson': xy_stddev_pearson_2_xy_sigma,
