@@ -1,0 +1,28 @@
+{
+  "nproc": 10,
+  "img_dirs": [
+    "mmrotate-1.x/data/OCD/train/images"
+  ],
+  "ann_dirs": [
+    "mmrotate-1.x/data/OCD/train/annfiles/dota2class"
+  ],
+  "sizes": [
+    512
+  ],
+  "gaps": [
+    256
+  ],
+  "rates": [
+    1.0
+  ],
+  "img_rate_thr": 0.6,
+  "iof_thr": 0.7,
+  "no_padding": false,
+  "padding_value": [
+    104,
+    116,
+    124
+  ],
+  "save_dir": "mmrotate-1.x/data/split_ss_ocd/train/",
+  "save_ext": ".png"
+}
