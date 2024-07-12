@@ -5,8 +5,12 @@ model = dict(
     bbox_head_init=dict(
         reg_decoded_bbox=True,
         loss_bbox=dict(
+            _delete_=True,
             type='GDLoss',
-            loss_type='probiou',
+            loss_type='gwd',
+            fun='log1p',
+            tau=1.0,
+            normalize=True,
             loss_weight=5.0)),
     bbox_head_refine=[
         dict(
@@ -37,6 +41,9 @@ model = dict(
             reg_decoded_bbox=True,
             loss_bbox=dict(
                 type='GDLoss',
-                loss_type='probiou',
+                loss_type='gwd',
+                fun='log1p',
+                tau=1.0,
+                normalize=True,
                 loss_weight=5.0))
     ])
