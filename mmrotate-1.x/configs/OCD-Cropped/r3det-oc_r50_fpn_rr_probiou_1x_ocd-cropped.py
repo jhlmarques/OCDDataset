@@ -5,6 +5,7 @@ model = dict(
     bbox_head_init=dict(
         reg_decoded_bbox=True,
         loss_bbox=dict(
+            _delete_=True,
             type='GDLoss',
             loss_type='probiou',
             loss_weight=5.0)),

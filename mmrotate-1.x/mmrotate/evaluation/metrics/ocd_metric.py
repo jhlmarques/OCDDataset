@@ -111,6 +111,8 @@ class OCDMetric(DOTAMetric):
         widths = bboxes[:, 2]
         heights = bboxes[:, 3]
         im_w, im_h = image.size
+        assert im_w in [1280, 1388]
+        assert im_h in [720, 1040]
         im_area = im_w * im_h
         box_areas = widths * heights
         sum_of_areas = box_areas.sum()

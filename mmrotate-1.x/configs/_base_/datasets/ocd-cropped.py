@@ -30,17 +30,9 @@ val_pipeline = [
         meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
                    'scale_factor'))
 ]
-test_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
-    dict(type='mmdet.Resize', scale=(512, 512), keep_ratio=True),
-    dict(
-        type='mmdet.PackDetInputs',
-        meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
-                   'scale_factor'))
-]
 
 train_dataloader = dict(
-    batch_size=2,
+    batch_size=16,
     num_workers=2,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
